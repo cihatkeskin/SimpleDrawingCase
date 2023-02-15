@@ -66,7 +66,6 @@ namespace SimpleDrawingCase
             this.Panel.Name = "Panel";
             this.Panel.Size = new System.Drawing.Size(1133, 768);
             this.Panel.TabIndex = 0;
-            this.Panel.Paint += new System.Windows.Forms.PaintEventHandler(this.PaintPanel);
             this.Panel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDownPanel);
             this.Panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MouseMovePanel);
             this.Panel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpPanel);
@@ -159,7 +158,7 @@ namespace SimpleDrawingCase
             this.BtnBeyaz.Size = new System.Drawing.Size(67, 68);
             this.BtnBeyaz.TabIndex = 2;
             this.BtnBeyaz.UseVisualStyleBackColor = false;
-            this.BtnBeyaz.Click += new System.EventHandler(this.ClickBeyaz);
+            this.BtnBeyaz.MouseClick += new System.Windows.Forms.MouseEventHandler(this.BeyazMouseClick);
             // 
             // BtnKirmizi
             // 
@@ -169,7 +168,7 @@ namespace SimpleDrawingCase
             this.BtnKirmizi.Size = new System.Drawing.Size(69, 68);
             this.BtnKirmizi.TabIndex = 1;
             this.BtnKirmizi.UseVisualStyleBackColor = false;
-            this.BtnKirmizi.Click += new System.EventHandler(this.ClickKirmizi);
+            this.BtnKirmizi.MouseClick += new System.Windows.Forms.MouseEventHandler(this.KirmiziMouseClick);
             // 
             // BtnMor
             // 
@@ -179,7 +178,7 @@ namespace SimpleDrawingCase
             this.BtnMor.Size = new System.Drawing.Size(69, 68);
             this.BtnMor.TabIndex = 7;
             this.BtnMor.UseVisualStyleBackColor = false;
-            this.BtnMor.Click += new System.EventHandler(this.ClickMor);
+            this.BtnMor.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MorMouseClick);
             // 
             // BtnYesil
             // 
@@ -189,7 +188,7 @@ namespace SimpleDrawingCase
             this.BtnYesil.Size = new System.Drawing.Size(67, 68);
             this.BtnYesil.TabIndex = 3;
             this.BtnYesil.UseVisualStyleBackColor = false;
-            this.BtnYesil.Click += new System.EventHandler(this.ClickYesil);
+            this.BtnYesil.MouseClick += new System.Windows.Forms.MouseEventHandler(this.YesilMouseClick);
             // 
             // BtnKahve
             // 
@@ -199,7 +198,7 @@ namespace SimpleDrawingCase
             this.BtnKahve.Size = new System.Drawing.Size(67, 68);
             this.BtnKahve.TabIndex = 1;
             this.BtnKahve.UseVisualStyleBackColor = false;
-            this.BtnKahve.Click += new System.EventHandler(this.ClickKahve);
+            this.BtnKahve.MouseClick += new System.Windows.Forms.MouseEventHandler(this.KahveMouseClick);
             // 
             // BtnMavi
             // 
@@ -209,7 +208,7 @@ namespace SimpleDrawingCase
             this.BtnMavi.Size = new System.Drawing.Size(67, 68);
             this.BtnMavi.TabIndex = 2;
             this.BtnMavi.UseVisualStyleBackColor = false;
-            this.BtnMavi.Click += new System.EventHandler(this.ClickMavi);
+            this.BtnMavi.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MaviMouseClick);
             // 
             // BtnSari
             // 
@@ -219,7 +218,7 @@ namespace SimpleDrawingCase
             this.BtnSari.Size = new System.Drawing.Size(67, 68);
             this.BtnSari.TabIndex = 6;
             this.BtnSari.UseVisualStyleBackColor = false;
-            this.BtnSari.Click += new System.EventHandler(this.ClickSari);
+            this.BtnSari.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SariMouseClick);
             // 
             // BtnTuruncu
             // 
@@ -229,7 +228,7 @@ namespace SimpleDrawingCase
             this.BtnTuruncu.Size = new System.Drawing.Size(69, 68);
             this.BtnTuruncu.TabIndex = 4;
             this.BtnTuruncu.UseVisualStyleBackColor = false;
-            this.BtnTuruncu.Click += new System.EventHandler(this.ClickTuruncu);
+            this.BtnTuruncu.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TuruncuMouseClick);
             // 
             // BtnSiyah
             // 
@@ -239,7 +238,7 @@ namespace SimpleDrawingCase
             this.BtnSiyah.Size = new System.Drawing.Size(67, 68);
             this.BtnSiyah.TabIndex = 5;
             this.BtnSiyah.UseVisualStyleBackColor = false;
-            this.BtnSiyah.Click += new System.EventHandler(this.ClickSiyah);
+            this.BtnSiyah.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SiyahMouseClick);
             // 
             // groupBox3
             // 
