@@ -10,8 +10,8 @@ namespace SimpleDrawingCase
     [Serializable]
     public class RectangleShape : Shape
     {
-        public RectangleShape(Point locationStaritng, Point locationEnding) : base(locationStaritng, locationEnding) { }
-        public RectangleShape(Point locationStaritng, Point locationEnding, Color color) : base(locationStaritng, locationEnding, color) { }
+        public RectangleShape(Point locationStarting, Point locationEnding) : base(locationStarting, locationEnding) { }
+        public RectangleShape(Point locationStarting, Point locationEnding, Color color) : base(locationStarting, locationEnding, color) { }
 
         public override void SetCornerPoints()
         {

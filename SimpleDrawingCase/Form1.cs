@@ -26,7 +26,9 @@ namespace SimpleDrawingCase
         Point MouseDownStartingLocation; // çizilen şeklin başlangıç konumu
         Point MouseDownEndingLocation; // çizilen şeklin bitiş konumu (mouse bırakıldığı nokta)
         Point newLocation; // taşıma işlemlerinde yeni konumu belirlemek için
-
+        Button prevSelectedButton; // önceki seçilen butonu belirtmek için
+        Button selectedButton; // seçilen butonu belirtmek için
+        
         // hangi nesnenin çizildiğini belirlemek için 
         bool IsMouseDownRectange = false;
         bool IsMouseDownCircle = false;
@@ -41,7 +43,6 @@ namespace SimpleDrawingCase
         bool IsMouseDownDelete = false;
         bool IsMouseChangedColor = false;
         bool Moving = false;
-        bool ColorChange = false;
         bool IsDelete = false;
 
         enum _Shapes // karışıklık olmaması adına hangi şeklin çizildiğini belirlemek için enum yapısı tutuldu
@@ -50,32 +51,50 @@ namespace SimpleDrawingCase
             _circle,
             _triangle,
             _hexagon
-
         }
         _Shapes _shape;
 
         public Form1()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
             g = Panel.CreateGraphics();
             shapeList = new List<Shape>();
-            //  rectangle.BorderStyle = BorderStyle.Fixed3D;
-            _shape = 0;
         }
 
         #region Tanımlanan Fonksiyonlar
-        private void AllPictureBoxRemoveBorder(GroupBox groupBx) // groupBox içinde bir buton seçildiğinde kalan butonların pasif yapılması işlemini yapıyor.
+        private void SelectedButtonBorder(Button button) // buton seçildiğinde o butonun borderını arttırma
         {
-            foreach (var item in groupBx.Controls.OfType<PictureBox>())
-                item.BorderStyle = BorderStyle.None;
+            // Seçili butonu belirleyin
+            selectedButton = button;
+
+            // Tüm butonların kenarlıklarını kaldırın
+            foreach (Button btn in this.Controls.OfType<Button>())
+            {
+                btn.FlatStyle = FlatStyle.Standard;
+                btn.FlatAppearance.BorderSize = 1;
+            }
+
+            // Seçili butonun kenarlarını kalınlaştırın
+            selectedButton.FlatStyle = FlatStyle.Flat;
+            selectedButton.FlatAppearance.BorderSize = 3;
+            selectedButton.FlatAppearance.BorderColor = Color.DarkGray;
+
+            // Önceki seçili butonun kenarlık detaylarını sıfırlayın
+            if (prevSelectedButton != null && prevSelectedButton != selectedButton)
+            {
+                prevSelectedButton.FlatStyle = FlatStyle.Standard;
+                prevSelectedButton.FlatAppearance.BorderSize = 1;
+            }
+
+            // Seçili butonu önceki seçili buton olarak ayarlayın
+            prevSelectedButton = selectedButton;
         }
 
-        private void ColorButtonClick(Color color, PictureBox pictureBox) // renk seçildiğinde seçilen rengi alma ve ilgili butonu aktif, diğperini pasif yapma işlemini yapıyor
+        private void ColorButtonClick(Color color) // renk seçildiğinde seçilen rengi alma
         {
             brush = new SolidBrush(color);
             IsMouseChangedColor = true;
-            AllPictureBoxRemoveBorder(groupBox2);
-            pictureBox.BorderStyle = BorderStyle.Fixed3D;
         }
 
         private void CreateShape(Shape shape)
@@ -91,31 +110,7 @@ namespace SimpleDrawingCase
         }
 
         #region Dosya İşlemleri için Fonksiyonlar
-        public void ExportToTextFile(List<Shape> list) // nesneleri bir txt olarak kaydeder
-        {
-            SaveFileDialog save = new SaveFileDialog(); // savedialog ekranını açma
-            save.OverwritePrompt = false; // aynı isimde bir dosya varsa üzerine yazmaz onay mesajı çıkar
-            save.CreatePrompt = true; // aynı isimde dosya yoksa yine onay mesajı çıkar
-            save.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); // hani dizinde açılacağı
-            save.Title = "Txt"; // dialog penceresinin başlığı
-            save.DefaultExt = "txt"; // varsayılan dosya uzantısı
-            save.Filter = "txt Dosyaları|*.txt"; //dialog ekranında görebileceğimiz uzantılar
-                                                 // save.ShowDialog();
-            
-                if (save.ShowDialog() == DialogResult.OK)
-                {
-                    StreamWriter sw = new StreamWriter(save.FileName);
-                    foreach (var item in list)
-                    {
-                        sw.WriteLine("{0},{1},{2},{3},{4},{5}", item.ToString(), item.BrushColor.Color.Name, item.LocationStarting.X, item.LocationStarting.Y,
-                            item.LocationEnding.X, item.LocationEnding.Y);
-                    }
-                    sw.Close();
-                }
-
-                save.ShowDialog();
-            
-        }
+        
         public string ImportToTextFile() // text dosyasını okur
         {
             OpenFileDialog file = new OpenFileDialog();
@@ -136,7 +131,7 @@ namespace SimpleDrawingCase
         }
         public void FileReadingAndDrawing(string filePath)
         {
-            Color colorObject;
+            System.Drawing.Color colorObject;
             Point locationStartingObject;
             Point locationEndingObject;
         
@@ -179,89 +174,99 @@ namespace SimpleDrawingCase
 
         #endregion
 
+        #region Şekil ve Renk Clickleri
         private void ClickDikdortgen(object sender, EventArgs e)
         {
             _shape = _Shapes._rectangle; // nesnenin rectangle olacağı belirleniyor
-
-            // sadece seçilen şekil aktif yapılıyor
-            AllPictureBoxRemoveBorder(groupBox1);
-            //BtnDikdortgen.BorderStyle = BorderStyle.Fixed3D;
+            SelectedButtonBorder(BtnDikdortgen);
         }
 
         private void ClickDaire(object sender, EventArgs e)
         {
             _shape = _Shapes._circle;
+            SelectedButtonBorder(BtnDaire);
         }
 
         private void ClickUcgen(object sender, EventArgs e)
         {
-            _shape = _Shapes._triangle;
+            _shape = _Shapes._triangle; ;
+            SelectedButtonBorder(BtnUcgen);
         }
 
         private void ClickAltigen(object sender, EventArgs e)
         {
             _shape = _Shapes._hexagon;
+            SelectedButtonBorder(BtnAltigen);
         }
         private void KirmiziMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Red;
+            ColorButtonClick(Color.Red);
+            SelectedButtonBorder(BtnKirmizi);
         }
 
         private void YesilMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Green;
+            ColorButtonClick(Color.Green);
+            SelectedButtonBorder(BtnYesil);
         }
 
         private void MaviMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Blue;
+            ColorButtonClick(Color.Blue);
+            SelectedButtonBorder(BtnMavi);
         }
 
         private void TuruncuMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Orange;
+            ColorButtonClick(Color.Orange);
+            SelectedButtonBorder(BtnTuruncu);
         }
 
         private void SiyahMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Black;
+            ColorButtonClick(Color.Black);
+            SelectedButtonBorder(BtnSiyah);
         }
 
         private void SariMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Yellow;
+            ColorButtonClick(Color.Yellow);
+            SelectedButtonBorder(BtnSari);
         }
 
         private void MorMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Purple;
+            ColorButtonClick(Color.Purple);
+            SelectedButtonBorder(BtnMor);
         }
 
         private void KahveMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.Brown;
+            ColorButtonClick(Color.Brown);
+            SelectedButtonBorder(BtnKahve);
         }
 
         private void BeyazMouseClick(object sender, MouseEventArgs e)
         {
-            color = Color.White;
+            ColorButtonClick(Color.White);
+            SelectedButtonBorder(BtnBeyaz);
         }
+
+        #endregion
 
         private void ClickSecim(object sender, EventArgs e)
         {
             IsMouseDownChoose = true;
-            IsMouseDownDelete = false;
-            //chooseBtn.BorderStyle = BorderStyle.Fixed3D;
-            //deleteBtn.BorderStyle = BorderStyle.None;
+            //IsMouseDownDelete = false;
+            SelectedButtonBorder(BtnSecim);
         }
 
 
         private void ClickSil(object sender, EventArgs e)
         {
-            IsMouseDownChoose = true;
-            IsMouseDownDelete = false;
-            //BtnSil.BorderStyle = BorderStyle.Fixed3D;
-            //BtnSil.BorderStyle = BorderStyle.None;
+            //IsMouseDownChoose = false;
+            IsMouseDownDelete = true;
+            SelectedButtonBorder(BtnSil);
         }
 
         private void ClickTemizle(object sender, EventArgs e)
@@ -271,26 +276,51 @@ namespace SimpleDrawingCase
             Panel.Update();
             MouseDownStartingLocation = new Point(0, 0);
             MouseDownEndingLocation = new Point(0, 0);
+            SelectedButtonBorder(BtnTemizle);
         }
 
         private void ClickDosyaAc(object sender, EventArgs e)
         {
-            //exportBtn.BorderStyle = BorderStyle.Fixed3D;
-            //importBtn.BorderStyle = BorderStyle.None;
-            ExportToTextFile(shapeList);
-        }
-
-        private void ClickKaydet(object sender, EventArgs e)
-        {
-            //importBtn.BorderStyle = BorderStyle.Fixed3D;
-            //exportBtn.BorderStyle = BorderStyle.None;
             string filePath = ImportToTextFile();
             FileReadingAndDrawing(filePath);
         }
 
+        private void ClickKaydet(object sender, EventArgs e)
+        {
+            SaveFileDialog save = new SaveFileDialog(); // savedialog ekranını açma
+            save.Filter = "txt Dosyaları|*.txt"; //dialog ekranında görebileceğimiz uzantılar
+                                                 // save.ShowDialog();
+            save.OverwritePrompt = true; // aynı isimde bir dosya varsa üzerine yazmaz onay mesajı çıkar
+            save.CreatePrompt = true; // aynı isimde dosya yoksa yine onay mesajı çıkar
+
+            if (save.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter sw = new StreamWriter(save.FileName);
+                foreach (Shape item in shapeList)
+                {
+                    sw.WriteLine(item.X);
+                    sw.WriteLine(item.Y);
+                    sw.WriteLine(item.Width);
+                    sw.WriteLine(item.Height);
+                    sw.WriteLine(item.LocationStarting);
+                    sw.WriteLine(item.LocationEnding);
+                }
+
+                sw.Close();
+            }
+        }
 
         private void MouseDownPanel(object sender, MouseEventArgs e)
         {
+            //// Şekil çizme işlemi başlatıldığında
+            //drawingShape = true;
+
+            //// Başlangıç noktasını kaydedin
+            //startPoint = e.Location;
+
+            //// Şekil merkez noktasını hesaplayın
+            //center = e.Location;
+
             // çizdirme, seçim olmadan, sadece nesneyi seçerek
             if (e.Button == MouseButtons.Left && !paint && !IsMouseChoose && IsDelete == false && !IsMouseDownChoose && !IsMouseDownDelete)
             {
@@ -342,7 +372,6 @@ namespace SimpleDrawingCase
                     if ((item.X < e.X && e.X < item.X + item.Width) && (item.Y < e.Y && e.Y < item.Y + item.Height))
                         shape = item;
                 }
-
             }
 
             // silme
@@ -353,37 +382,72 @@ namespace SimpleDrawingCase
                     if ((item.X < e.X && e.X < item.X + item.Width) && (item.Y < e.Y && e.Y < item.Y + item.Height))
                         shape = item;
                 }
+            }
+
+            // seçili nesnenin etrafını işaretleme -- çalışmıyor
+            if (e.Button == MouseButtons.Left && IsMouseDownChoose && !Moving && shapeList.Count != 0 && !paint && !IsMouseDownDelete && !IsMouseChangedColor)
+            {
+                foreach (var item in shapeList)
+                {
+                    if ((item.X < e.X && e.X < item.X + item.Width) && (item.Y < e.Y && e.Y < item.Y + item.Height))
+                    {
+                        shape = item;
+                        Color c = Color.FromArgb(150, 0, 0, 0);
+                        SolidBrush sb = new SolidBrush(c);
+
+                        g.FillRectangle(sb, item.X, item.Y, item.Width, item.Height);
+
+                    }
+                }
+
+                IsMouseDownChoose = false;
 
             }
 
-            //// seçili nesnenin etrafını işaretleme -- çalışmıyor
-            //if (e.Button == MouseButtons.Left && IsMouseDownChoose && !Moving && shapeList.Count != 0 && !paint && !IsMouseDownDelete && !IsMouseChangedColor)
-            //{
-            //    foreach (var item in shapeList)
-            //    {
-            //        if ((item.X < e.X && e.X < item.X + item.Width) && (item.Y < e.Y && e.Y < item.Y + item.Height))
-            //        {
-            //            shape = item;
-            //            Color c = Color.FromArgb(150, 0, 0, 0);
-            //            SolidBrush sb = new SolidBrush(c);
-
-            //            g.FillRectangle(sb, item.X, item.Y, item.Width, item.Height);
-
-            //        }
-            //    }
-            //    IsMouseDownChoose = false;
-            //    chooseBtn.BorderStyle = BorderStyle.None;
-            //}
-
-            // nesnenin renginin değişmesi için nesneyi taşıma
+            //nesnenin renginin değişmesi için nesneyi taşıma
             // basıldıysa ve renk değiştirme aktifse
         }
 
         private void MouseMovePanel(object sender, MouseEventArgs e)
         {
+            label1.Text = $"Mouse Location(X, Y):  {e.X.ToString()}  {e.Y.ToString()}";//mouse lokasyonunu belirtir.
+
+            //// Şekil çizme işlemi sırasında
+            //if (drawingShape)
+            //{
+            //    // Şekil boyutunu ve konumunu hesaplayın
+            //    width = Math.Abs(e.X - startPoint.X);
+            //    height = Math.Abs(e.Y - startPoint.Y);
+            //    size = Math.Max(width, height);
+            //    x = Math.Min(startPoint.X, e.X) - size / 2;
+            //    y = Math.Min(startPoint.Y, e.Y) - size / 2;
+
+            //    // Şekil merkez noktasını güncelleyin
+            //    center = new Point(x + size / 2, y + size / 2);
+            //}
+
+            //if (e.Button == MouseButtons.Left)
+            //{
+            //    // Fare sola doğru çekildiğinde genişlik artacak
+            //    rectSize.Width = e.X - rectCenter.X;
+
+            //    // Fare aşağı doğru çekildiğinde yükseklik artacak
+            //    rectSize.Height = e.Y - rectCenter.Y;
+
+            //    Panel.Refresh();
+            //}
+
+            //Daire
+            //if (drawingShape)
+            //{
+            //    radius = (int)Math.Sqrt(Math.Pow(e.X - centerX, 2) + Math.Pow(e.Y - centerY, 2));
+            //    Panel.Invalidate();
+            //}
+
             // nesneyi oluşturma
             if (e.Button == MouseButtons.Left && paint && !IsMouseChoose && !IsMouseDownChoose && !IsMouseDownDelete)
                 MouseDownEndingLocation = e.Location;
+
 
             // nesneyi taşıma
             if (e.Button == MouseButtons.Left && IsMouseChoose && Moving && IsMouseDownChoose && !IsMouseChangedColor && !IsMouseDownDelete && !paint)
@@ -391,10 +455,35 @@ namespace SimpleDrawingCase
                 Panel.Invalidate(new Rectangle(shape.X, shape.Y, shape.Width, shape.Height));
                 Panel.Update();
             }
+
         }
 
         private void MouseUpPanel(object sender, MouseEventArgs e)
         {
+            //// Şekil çizme işlemi bittiğinde
+            //drawingShape = false;
+
+            //// Paneli yeniden çizin
+            //Panel.Invalidate();
+
+            //// Dikdörtgenin koordinatlarını ayarla
+            //int x = rectCenter.X - rectSize.Width / 2;
+            //int y = rectCenter.Y - rectSize.Height / 2;
+            //int width = rectSize.Width;
+            //int height = rectSize.Height;
+
+            //// Dikdörtgenin merkezini bul
+            //rectCenter = new Point(x + width / 2, y + height / 2);
+
+            //// Dikdörtgenin koordinatlarını merkezi sabit kalacak şekilde ayarla
+            //x = rectCenter.X - width / 2;
+            //y = rectCenter.Y - height / 2;
+
+            //Panel.Refresh();
+
+            //Daire
+            ////drawingShape = false;
+
             // nesneyi oluşturma
             if (e.Button == MouseButtons.Left && paint && !IsMouseChoose && !IsMouseDownChoose && !IsMouseDownDelete)
             {
@@ -437,8 +526,7 @@ namespace SimpleDrawingCase
                 }
                 MouseDownEndingLocation = new Point(0, 0);
                 MouseDownStartingLocation = new Point(0, 0);
-                AllPictureBoxRemoveBorder(groupBox1);
-                AllPictureBoxRemoveBorder(groupBox2);
+
             }
 
             // taşıma işlemi 
@@ -491,16 +579,13 @@ namespace SimpleDrawingCase
 
                 IsMouseChoose = false;
                 Moving = false;
-                IsMouseDownChoose = false; ///////
+                IsMouseDownChoose = false; 
                 shape = null;
-                AllPictureBoxRemoveBorder(groupBox3);
             }
 
             // renk değiştime
             if (e.Button == MouseButtons.Left && IsMouseDownChoose && shape != null && IsMouseChangedColor && !IsMouseDownDelete && !paint)
             {
-
-
                 var _temp = shapeList.Where(x => x == shape);
                 foreach (var item in _temp)
                 {
@@ -518,17 +603,13 @@ namespace SimpleDrawingCase
                     g.FillPolygon(brush, shape.CornerPoints);
                 }
 
-                //  drawingArea.Update();
+                Panel.Update();
 
                 IsMouseDownChoose = false;
-                //BtnSecim.BorderStyle = BorderStyle.None;
 
                 shape = null;
                 IsMouseChangedColor = false;
                 IsMouseDownChoose = false;
-                //    ColorChange = true;
-                AllPictureBoxRemoveBorder(groupBox1);
-                AllPictureBoxRemoveBorder(groupBox2);
             }
 
             // silme
@@ -540,12 +621,26 @@ namespace SimpleDrawingCase
                 shape = null;
                 IsMouseDownChoose = false;
                 IsDelete = false;
-                //BtnSecim.BorderStyle = BorderStyle.None;
                 System.Threading.Thread.Sleep(500);
-                //BtnSil.BorderStyle = BorderStyle.None;
+
             }
         }
 
-        
+        private void PaintPanel(object sender, PaintEventArgs e)
+        {
+            // Şekli çizmek için gerekli olan Pen ve Brush nesnelerini oluşturun
+            //SolidBrush brush = new SolidBrush(Color.Black);
+
+            // Şekli çizin
+            //if (selectedShape == Shapes.Rectangle)
+            //{
+            //    e.Graphics.FillRectangle(brush, x, y, size, size);
+            //}
+
+            //else if (selectedShape == Shapes.Circle)
+            //{
+            //    e.Graphics.FillEllipse(brush, center.X - size / 2, center.Y - size / 2, size, size);
+            //}
+        }
     }
 }

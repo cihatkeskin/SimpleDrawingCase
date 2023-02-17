@@ -66,6 +66,7 @@ namespace SimpleDrawingCase
             this.Panel.Name = "Panel";
             this.Panel.Size = new System.Drawing.Size(1133, 768);
             this.Panel.TabIndex = 0;
+            this.Panel.Paint += new System.Windows.Forms.PaintEventHandler(this.PaintPanel);
             this.Panel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDownPanel);
             this.Panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MouseMovePanel);
             this.Panel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpPanel);
